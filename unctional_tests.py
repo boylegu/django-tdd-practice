@@ -2,7 +2,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
-import time
+import time # 为了调试,可用time.sleep
 
 
 class NewVisitorTest(unittest.TestCase):
@@ -12,6 +12,11 @@ class NewVisitorTest(unittest.TestCase):
 
     def tearDown(self):
         self.browser.quit()
+
+    def check_for_row_in_list_table(self, row_text):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         # 打开首页
@@ -36,21 +41,14 @@ class NewVisitorTest(unittest.TestCase):
         # 并且办事项显示了相应的信息
         inputbox.send_keys(Keys.ENTER)
 
-        # 为了调试debug
+        self.check_for_row_in_list_table('1: Buy peacock feathers')
 
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Use peacock feathers to make a fly')
+        inputbox.send_keys(Keys.ENTER)
 
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        # self.assertTrue(
-        #     any(row.text == '1: Buy peacock feathers' for row in rows),
-        #     "New to-do item did not appear in table -- its text was:\n %s" % (table.text)  # any() ?
-        # )
-
-        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
-        # self.assertIn('2: Use peacok feathers to make a fly', [row.text for row in rows])
-
-        # 此后页面中又显示了一个文本框,可以输入其他的待办事项,接着她又输入了......
-
+        self.check_for_row_in_list_table('1: Buy peacock feathers')
+        self.check_for_row_in_list_table('2: Use peacock feathers to make a fly')
         self.fail('Finish the test')
 
 
