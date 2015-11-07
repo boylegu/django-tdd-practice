@@ -35,7 +35,7 @@ class NewVisitorTest(unittest.TestCase):
         )
 
         # 然后输入一个任务项
-        inputbox.send_keys("1: Buy peacock feathers")
+        inputbox.send_keys("Buy peacock feathers")
 
         # 按回车键之后,页面更新了
         # 并且办事项显示了相应的信息
