@@ -1,4 +1,6 @@
 # coding: utf-8
+import sys
+
 # from django.test import LiveServerTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
@@ -9,6 +11,21 @@ import time  # 为了调试,可用time.sleep
 
 # class NewVisitorTest(LiveServerTestCase):
 class NewVisitorTest(StaticLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        for arg in sys.argv:
+            if 'liveserver' in arg:
+                cls.server_url = 'http://' + arg.split('=')[1]
+                return
+        super().setUpClass()
+        cls.server_url = cls.live_server_url
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.server_url == cls.live_server_url:
+            super().tearDownClass()
+
+    # 本地开发环境的setUp
     def setUp(self):
         self.browser = webdriver.Chrome(executable_path='../chromedriver')
         self.browser.implicitly_wait(3)
@@ -23,7 +40,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         # 打开首页
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
 
         # 确定断网页的标题和头部都包含了'TO-DO'这个词
         self.assertIn('To-Do', self.browser.title)
@@ -60,7 +77,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.browser = webdriver.Chrome(executable_path='../chromedriver')
 
         # 佛朗西斯访问首页,并且看不到伊迪丝的清单
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('make a fly', page_text)
@@ -84,7 +101,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
     def test_layout_and_styling(self):
         # 用户A访问首页
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         self.browser.set_window_size(1024, 768)
 
         # 她新建了一个清单, 看到输入框完美的居中显示
