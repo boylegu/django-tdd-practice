@@ -37,3 +37,7 @@ class ListAndItemModelsTest(TestCase):
         with self.assertRaises(ValidationError):
             item.save()
             item.full_clean()  # Django的一个怪异行为,因此使用该方法 详情请见TDD for django P 167
+
+    def test_get_absolute_url(self):
+        list_ = List.objects.create()
+        self.assertEqual(list_.get_absolute_url(), '/lists/%d/' %(list_.id,))
